@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 
 // Proxy middleware configuration
-const proxyOptions = {
+const proxyOptions = Object.assign({}, {
   target: 'https://api.alquran.cloud',
   changeOrigin: true,
   pathRewrite: {
@@ -25,7 +25,7 @@ const proxyOptions = {
   },
   secure: false,
   logLevel: 'debug',
-};
+});
 
 // Use the proxy for /api routes
 app.use('/api', createProxyMiddleware(proxyOptions));
@@ -56,5 +56,14 @@ process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing HTTP server');
   server.close(() => {
     console.log('HTTP server closed');
+  });
+});
+
+// Keep the process running
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
   });
 }); 
